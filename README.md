@@ -1,8 +1,6 @@
-# Builder and Decorator Design Patterns - UML Diagrams
+# Builder Design Pattern - UML Diagrams
 
-## 1. Builder Pattern
-
-### UML Class Diagram
+## 1. Builder Pattern - Class Diagram
 
 ```mermaid
 classDiagram
@@ -42,7 +40,9 @@ classDiagram
     House o-- HouseBuilder : constructed by
 ```
 
-### Sequence Diagram - Building a House
+---
+
+## 2. Sequence Diagram - Building a House
 
 ```mermaid
 sequenceDiagram
@@ -77,15 +77,20 @@ sequenceDiagram
     Product-->>Client: "House [foundation=Concrete, ...]"
 ```
 
-### Pattern Structure
+---
+
+## 3. Builder Pattern Flow
 
 ```mermaid
 graph TB
-    subgraph "Builder Pattern Components"
-        A[Client/Director] -->|1. Creates| B[Builder]
-        B -->|2. Configures step by step| B
-        B -->|3. Builds| C[Product]
-        C -->|4. Returns| A
+    subgraph "Builder Pattern Construction Flow"
+        A[Client<br/>BuilderDemo] -->|1. Creates| B[Builder<br/>HouseBuilder]
+        B -->|2. setFoundation| B
+        B -->|3. setStructure| B
+        B -->|4. setRoof| B
+        B -->|5. setSwimmingPool| B
+        B -->|6. build| C[Product<br/>House]
+        C -->|7. Returns| A
     end
     
     style A fill:#e1f5ff
@@ -95,326 +100,279 @@ graph TB
 
 ---
 
-## 2. Decorator Pattern
-
-### UML Class Diagram
+## 4. Method Chaining Visualization
 
 ```mermaid
-classDiagram
-    class Beverage {
-        <<interface>>
-        +getDescription(): String
-        +getCost(): double
-    }
+flowchart LR
+    A[new HouseBuilder] --> B[setFoundation]
+    B --> C[setStructure]
+    C --> D[setRoof]
+    D --> E[setSwimmingPool]
+    E --> F[build]
+    F --> G[House Object]
     
-    class Espresso {
-        +getDescription(): String
-        +getCost(): double
-    }
+    B -.->|returns this| C
+    C -.->|returns this| D
+    D -.->|returns this| E
+    E -.->|returns this| F
     
-    class HouseBlend {
-        +getDescription(): String
-        +getCost(): double
-    }
-    
-    class DarkRoast {
-        +getDescription(): String
-        +getCost(): double
-    }
-    
-    class CondimentDecorator {
-        <<abstract>>
-        #Beverage beverage
-        +CondimentDecorator(beverage: Beverage)
-        +getDescription(): String*
-        +getCost(): double*
-    }
-    
-    class Milk {
-        +Milk(beverage: Beverage)
-        +getDescription(): String
-        +getCost(): double
-    }
-    
-    class Mocha {
-        +Mocha(beverage: Beverage)
-        +getDescription(): String
-        +getCost(): double
-    }
-    
-    class Whip {
-        +Whip(beverage: Beverage)
-        +getDescription(): String
-        +getCost(): double
-    }
-    
-    class Soy {
-        +Soy(beverage: Beverage)
-        +getDescription(): String
-        +getCost(): double
-    }
-    
-    Beverage <|.. Espresso : implements
-    Beverage <|.. HouseBlend : implements
-    Beverage <|.. DarkRoast : implements
-    Beverage <|.. CondimentDecorator : implements
-    CondimentDecorator <|-- Milk : extends
-    CondimentDecorator <|-- Mocha : extends
-    CondimentDecorator <|-- Whip : extends
-    CondimentDecorator <|-- Soy : extends
-    CondimentDecorator o-- Beverage : wraps
-```
-
-### Sequence Diagram - Decorating a Beverage
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Espresso
-    participant Mocha
-    participant Whip
-    
-    Client->>Espresso: new Espresso()
-    activate Espresso
-    Espresso-->>Client: espresso
-    deactivate Espresso
-    
-    Client->>Mocha: new Mocha(espresso)
-    activate Mocha
-    Mocha-->>Client: mocha wrapped espresso
-    deactivate Mocha
-    
-    Client->>Whip: new Whip(mocha)
-    activate Whip
-    Whip-->>Client: whip wrapped mocha
-    deactivate Whip
-    
-    Client->>Whip: getDescription()
-    activate Whip
-    Whip->>Mocha: getDescription()
-    activate Mocha
-    Mocha->>Espresso: getDescription()
-    activate Espresso
-    Espresso-->>Mocha: "Espresso"
-    deactivate Espresso
-    Mocha-->>Whip: "Espresso, Mocha"
-    deactivate Mocha
-    Whip-->>Client: "Espresso, Mocha, Whip"
-    deactivate Whip
-    
-    Client->>Whip: getCost()
-    activate Whip
-    Whip->>Mocha: getCost()
-    activate Mocha
-    Mocha->>Espresso: getCost()
-    activate Espresso
-    Espresso-->>Mocha: 1.99
-    deactivate Espresso
-    Mocha-->>Whip: 1.99 + 0.20 = 2.19
-    deactivate Mocha
-    Whip-->>Client: 2.19 + 0.15 = 2.34
-    deactivate Whip
-```
-
-### Pattern Structure - Wrapping Concept
-
-```mermaid
-graph LR
-    subgraph "Decorator Wrapping"
-        A[Espresso<br/>$1.99] -->|wrapped by| B[Mocha<br/>+$0.20]
-        B -->|wrapped by| C[Whip<br/>+$0.15]
-        C -->|wrapped by| D[Caramel<br/>+$0.30]
-    end
-    
-    E[Final Cost:<br/>$2.64] -.->|Total| D
-    
-    style A fill:#8BC34A
-    style B fill:#FFC107
-    style C fill:#FF9800
-    style D fill:#F44336
-    style E fill:#2196F3,color:#fff
+    style A fill:#4CAF50,color:#fff
+    style G fill:#2196F3,color:#fff
 ```
 
 ---
 
-## 3. Pattern Comparison
-
-### Structural Differences
+## 5. Object Creation Comparison
 
 ```mermaid
 graph TB
-    subgraph "Builder Pattern - Creation Time"
-        B1[Client] -->|Step 1| B2[Builder]
-        B2 -->|Step 2| B2
-        B2 -->|Step 3| B2
-        B2 -->|Build| B3[Immutable Product]
+    subgraph "Without Builder Pattern - Telescoping Constructor"
+        W1[Constructor with all parameters]
+        W2["new House(foundation, structure, roof, swimmingPool)"]
+        W3[Hard to read<br/>Easy to make mistakes<br/>Cannot skip optional params]
+        W1 --> W2 --> W3
     end
     
-    subgraph "Decorator Pattern - Runtime"
-        D1[Component] -->|Wrap| D2[Decorator 1]
-        D2 -->|Wrap| D3[Decorator 2]
-        D3 -->|Wrap| D4[Decorator 3]
-        D4 -.->|Can add more| D5[Decorator N]
+    subgraph "With Builder Pattern - Fluent Interface"
+        B1[Builder with fluent methods]
+        B2["new HouseBuilder()<br/>.setFoundation('Concrete')<br/>.setStructure('Wood')<br/>.build()"]
+        B3[Easy to read<br/>Can skip optional params<br/>Clear and maintainable]
+        B1 --> B2 --> B3
     end
     
+    style W3 fill:#f44336,color:#fff
     style B3 fill:#4CAF50,color:#fff
-    style D1 fill:#2196F3,color:#fff
-    style D4 fill:#FF5722,color:#fff
 ```
 
-### When to Use Each Pattern
+---
+
+## 6. Design Explanation
+
+### What is the Builder Pattern?
+
+**Builder Pattern** is a creational design pattern that separates the construction of a complex object from its representation, allowing the same construction process to create different representations.
+
+### Key Components
+
+1. **Product (House)**: 
+   - The complex object being built
+   - Contains the fields: foundation, structure, roof, swimmingPool
+   - Has a package-private constructor that only the Builder can access
+
+2. **Builder (HouseBuilder)**:
+   - Provides methods to construct parts of the Product
+   - Each setter method returns `this` for method chaining
+   - Contains the same fields as the Product
+   - Has a `build()` method that creates the final Product
+
+3. **Director/Client (BuilderDemo)**:
+   - Uses the Builder to construct the object
+   - Calls builder methods in desired order
+   - Calls `build()` to get the final object
+
+---
+
+## 7. How Your Code Works
+
+### Step-by-Step Process
+
+```mermaid
+stateDiagram-v2
+    [*] --> CreateBuilder: new HouseBuilder()
+    CreateBuilder --> SetFoundation: setFoundation("Concrete")
+    SetFoundation --> SetStructure: setStructure("Wood")
+    SetStructure --> SetRoof: setRoof("Tiles")
+    SetRoof --> SetSwimmingPool: setSwimmingPool(true)
+    SetSwimmingPool --> Build: build()
+    Build --> HouseCreated: new House(builder)
+    HouseCreated --> [*]
+    
+    note right of CreateBuilder
+        Builder instance created
+        All fields are null/false
+    end note
+    
+    note right of SetFoundation
+        Each setter returns 'this'
+        Enables method chaining
+    end note
+    
+    note right of Build
+        Calls House constructor
+        Passes builder to House
+        House extracts values
+    end note
+```
+
+---
+
+## 8. Advantages & Disadvantages
+
+### ✅ Advantages
+
+```mermaid
+mindmap
+    root((Builder Pattern<br/>Advantages))
+        Readability
+            Fluent interface
+            Self-documenting code
+            Clear intent
+        Flexibility
+            Optional parameters
+            Any order of calls
+            Skip unwanted features
+        Immutability
+            Object built once
+            Cannot modify after creation
+            Thread-safe
+        Maintenance
+            Easy to add new parameters
+            No constructor explosion
+            Centralized construction logic
+```
+
+### ❌ Disadvantages
+
+| Disadvantage | Description |
+|-------------|-------------|
+| **More Code** | Need to create separate Builder class |
+| **Complexity** | Overkill for simple objects |
+| **Memory** | Two objects created (Builder + Product) |
+| **Learning Curve** | Developers need to understand the pattern |
+
+---
+
+## 9. When to Use Builder Pattern
 
 ```mermaid
 flowchart TD
-    Start{Need to create<br/>or modify object?}
+    Start{Designing<br/>a class?}
     
-    Start -->|Create| Q1{Object has many<br/>optional parameters?}
-    Start -->|Modify| Q2{Add features<br/>at runtime?}
+    Start --> Q1{Has many<br/>parameters?}
+    Q1 -->|No <br/>< 3 params| Simple[Use Simple<br/>Constructor]
+    Q1 -->|Yes <br/>> 4 params| Q2{Many optional<br/>parameters?}
     
-    Q1 -->|Yes| Builder[Use Builder Pattern]
-    Q1 -->|No| Simple[Use Simple Constructor]
+    Q2 -->|No| Overload[Use Constructor<br/>Overloading]
+    Q2 -->|Yes| Q3{Need immutable<br/>object?}
     
-    Q2 -->|Yes| Decorator[Use Decorator Pattern]
-    Q2 -->|No| Inheritance[Consider Inheritance]
+    Q3 -->|No| Setters[Use Setters]
+    Q3 -->|Yes| Builder[✅ Use Builder<br/>Pattern]
     
-    Builder -->|Benefits| B1[• Readable code<br/>• Immutable objects<br/>• Step-by-step construction]
-    Decorator -->|Benefits| D1[• Flexible extension<br/>• Runtime composition<br/>• Open/Closed Principle]
-    
-    style Builder fill:#4CAF50,color:#fff
-    style Decorator fill:#2196F3,color:#fff
+    style Builder fill:#4CAF50,color:#fff,stroke:#2E7D32,stroke-width:3px
+    style Simple fill:#2196F3,color:#fff
     style Start fill:#FF9800,color:#fff
 ```
 
 ---
 
-## 4. Design Explanation
+## 10. Real-World Examples
 
-### Builder Pattern
+### Common Use Cases
 
-**Purpose**: Separate the construction of a complex object from its representation.
-
-**Key Components**:
-1. **Product (House)**: The complex object being built
-2. **Builder (HouseBuilder)**: Provides methods to construct parts of the Product
-3. **Director (BuilderDemo)**: Constructs the object using the Builder interface
-
-**How It Works**:
+```mermaid
+mindmap
+    root((Builder Pattern<br/>Use Cases))
+        Java APIs
+            StringBuilder
+            StringBuffer
+            Calendar.Builder
+            HttpRequest.Builder
+        Database
+            SQL Query Builders
+            Hibernate Criteria
+            JOOQ Query Builder
+        Configuration
+            Spring Boot Config
+            Properties Builder
+            JSON/XML Builders
+        UI Frameworks
+            Android AlertDialog
+            JavaFX Builders
+            HTML Builders
+        Testing
+            Test Data Builders
+            Mock Object Builders
+            Fixture Builders
 ```
-Client → Builder.setFoundation()
-      → Builder.setStructure()
-      → Builder.setRoof()
-      → Builder.build() → Product (House)
-```
-
-**Advantages**:
-- ✅ Handles telescoping constructor problem
-- ✅ Immutable objects
-- ✅ Readable, fluent interface
-- ✅ Flexible object construction
-- ✅ Step-by-step construction
-
-**Disadvantages**:
-- ❌ More code (need Builder class)
-- ❌ Cannot change object after creation
 
 ---
 
-### Decorator Pattern
+## 11. Your Implementation Analysis
 
-**Purpose**: Attach additional responsibilities to an object dynamically.
+### Current Code Structure
 
-**Key Components**:
-1. **Component (Beverage)**: Interface for objects that can have responsibilities added
-2. **Concrete Component (Espresso, HouseBlend)**: Objects to which additional responsibilities can be attached
-3. **Decorator (CondimentDecorator)**: Maintains a reference to a Component object
-4. **Concrete Decorators (Milk, Mocha, Whip)**: Add responsibilities to the component
-
-**How It Works**:
+**House.java** (Product):
+```java
+- Private fields (foundation, structure, roof, swimmingPool)
+- Package-private constructor (accepts HouseBuilder)
+- toString() method for display
 ```
-Base Component (Espresso)
-    ↓ wrapped by
-Decorator 1 (Milk) - adds $0.10
-    ↓ wrapped by
-Decorator 2 (Mocha) - adds $0.20
-    ↓ wrapped by
-Decorator 3 (Whip) - adds $0.15
+
+**HouseBuilder.java** (Builder):
+```java
+- Same fields as House
+- Public setter methods returning 'this'
+- Getter methods for field access
+- build() method creating House instance
+```
+
+**BuilderDemo.java** (Client):
+```java
+- Creates HouseBuilder instances
+- Chains setter methods
+- Calls build() to get House
+- Demonstrates 5 different configurations
+```
+
+### Improvement Suggestions
+
+```mermaid
+graph LR
+    subgraph "Current Implementation"
+        C1[Separate Builder Class]
+        C2[Package-private Constructor]
+        C3[Getter methods in Builder]
+    end
     
-Total: $1.99 + $0.10 + $0.20 + $0.15 = $2.44
-```
-
-**Advantages**:
-- ✅ More flexible than inheritance
-- ✅ Add/remove responsibilities dynamically
-- ✅ Combine decorators in any order
-- ✅ Open/Closed Principle
-- ✅ Single Responsibility Principle
-
-**Disadvantages**:
-- ❌ Many small objects
-- ❌ Complexity in debugging
-- ❌ Order of decorators matters
-
----
-
-## 5. Real-World Examples
-
-### Builder Pattern Examples
-```mermaid
-mindmap
-    root((Builder<br/>Pattern))
-        StringBuilder
-            Append characters
-            Build string
-        HTTPRequest
-            Set URL
-            Set headers
-            Set body
-            Build request
-        SQL Query
-            SELECT
-            FROM
-            WHERE
-            Build query
-        UI Components
-            Set properties
-            Set style
-            Build component
-```
-
-### Decorator Pattern Examples
-```mermaid
-mindmap
-    root((Decorator<br/>Pattern))
-        Java I/O
-            FileInputStream
-            BufferedInputStream
-            DataInputStream
-        UI Components
-            ScrollPane
-            BorderPane
-            PaddingPane
-        Middleware
-            Authentication
-            Logging
-            Compression
-        Text Formatting
-            Bold
-            Italic
-            Underline
+    subgraph "Recommended Improvements"
+        R1[Make Builder static nested class]
+        R2[Make House fields final]
+        R3[Remove getters, use direct access]
+        R4[Add validation in build method]
+        R5[Add required parameters to Builder constructor]
+    end
+    
+    C1 -.-> R1
+    C2 -.-> R2
+    C3 -.-> R3
+    
+    style R1 fill:#4CAF50,color:#fff
+    style R2 fill:#4CAF50,color:#fff
+    style R3 fill:#4CAF50,color:#fff
+    style R4 fill:#4CAF50,color:#fff
+    style R5 fill:#4CAF50,color:#fff
 ```
 
 ---
 
-## 6. Summary Table
+## 12. Summary
 
-| Aspect | Builder Pattern | Decorator Pattern |
-|--------|----------------|-------------------|
-| **Type** | Creational | Structural |
-| **Purpose** | Construct complex objects | Add features dynamically |
-| **Timing** | Creation time | Runtime |
-| **Flexibility** | Configure before build | Wrap anytime |
-| **Immutability** | Usually immutable | Wraps existing objects |
-| **Use Case** | Many optional parameters | Extend functionality |
-| **Example** | Building a House | Adding toppings to Coffee |
+### Builder Pattern Overview
+
+| Aspect | Description |
+|--------|-------------|
+| **Pattern Type** | Creational |
+| **Purpose** | Construct complex objects step by step |
+| **Problem Solved** | Telescoping constructor problem |
+| **Key Benefit** | Readable, flexible object creation |
+| **Trade-off** | More code for better maintainability |
+| **Best For** | Classes with 4+ parameters, many optional fields |
+
+### Your Implementation
+
+✅ **Working correctly** - Demonstrates all Builder pattern principles  
+✅ **Method chaining** - Fluent interface implemented  
+✅ **Separation of concerns** - Builder and Product are separate  
+✅ **Flexible construction** - Can skip optional parameters  
 
 ---
